@@ -1,0 +1,14 @@
+{
+  "event_type": "cart_event",
+  "required_fields": ["user_id", "session_id", "product_id", "action", "timestamp"],
+  "field_types": {
+    "user_id": "string",
+    "session_id": "string",
+    "product_id": "string",
+    "action": "string",
+    "timestamp": "iso8601"
+  },
+  "field_ranges": {
+    "action": {"enum": ["add", "remove"]}
+  }
+}

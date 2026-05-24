@@ -1,0 +1,14 @@
+{
+  "event_type": "search",
+  "required_fields": ["user_id", "session_id", "query", "results_count", "timestamp"],
+  "field_types": {
+    "user_id": "string",
+    "session_id": "string",
+    "query": "string",
+    "results_count": "integer",
+    "timestamp": "iso8601"
+  },
+  "field_ranges": {
+    "results_count": {"min": 0, "max": 10000}
+  }
+}
