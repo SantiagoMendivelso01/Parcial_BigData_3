@@ -7,7 +7,6 @@ on:
     branches: [main]
 
 jobs:
-  # ── Job 1: Tests ─────────────────────────────────────────────────────────────
   tests:
     name: Tests
     runs-on: ubuntu-latest
@@ -24,11 +23,22 @@ jobs:
         run: |
           pip install faker numpy pytest boto3 moto[s3,cloudwatch] flask psycopg2-binary
 
-      - name: Correr todos los tests
+      - name: Tests generacion de datos
         run: |
-          pytest data_generation/tests/ lambda_ingest/tests/ lambda_api/tests/ -v
+          pytest data_generation/tests/ -v --import-mode=importlib
 
-  # ── Job 2: Generar datos y subir a S3 ────────────────────────────────────────
+      - name: Tests lambda ingest
+        run: |
+          pytest lambda_ingest/tests/ -v --import-mode=importlib
+
+      - name: Tests API
+        run: |
+          pytest lambda_api/tests/ -v --import-mode=importlib
+        env:
+          DB_HOST: localhost
+          DB_USER: test
+          DB_PASSWORD: test
+
   generate_and_upload:
     name: Generar datos sinteticos
     runs-on: ubuntu-latest
@@ -71,7 +81,6 @@ jobs:
             --input ./output \
             --bucket ${{ secrets.S3_BUCKET }}
 
-  # ── Job 3: Deploy Lambda ingest ──────────────────────────────────────────────
   deploy_lambda_ingest:
     name: Deploy Lambda ingest
     runs-on: ubuntu-latest
@@ -100,7 +109,6 @@ jobs:
           pip install -r requirements.txt -t package/ -q
           cp handler.py validators.py package/
           cd package && zip -r ../lambda_ingest.zip . -q
-          cd ..
           echo "ZIP: $(du -sh lambda_ingest.zip | cut -f1)"
 
       - name: Actualizar Lambda en AWS
@@ -109,7 +117,6 @@ jobs:
             --function-name shopstream-ingest \
             --zip-file fileb://lambda_ingest/lambda_ingest.zip
 
-  # ── Job 4: Deploy API con Zappa ──────────────────────────────────────────────
   deploy_api:
     name: Deploy API Zappa
     runs-on: ubuntu-latest
