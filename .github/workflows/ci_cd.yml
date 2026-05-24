@@ -24,12 +24,10 @@ jobs:
           pip install faker numpy pytest boto3 moto[s3,cloudwatch] flask psycopg2-binary
 
       - name: Tests generacion de datos
-        run: |
-          pytest data_generation/tests/ -v --import-mode=importlib
+        run: pytest data_generation/tests/ -v --import-mode=importlib
 
       - name: Tests lambda ingest
-        run: |
-          pytest lambda_ingest/tests/ -v --import-mode=importlib
+        run: pytest lambda_ingest/tests/ -v --import-mode=importlib
 
       - name: Tests API
         run: |
@@ -79,7 +77,7 @@ jobs:
           python data_generation/upload_to_s3.py \
             --date $DATE \
             --input ./output \
-            --bucket ${{ secrets.S3_BUCKET }}
+            --bucket shopstream-915741505963
 
   deploy_lambda_ingest:
     name: Deploy Lambda ingest
@@ -139,8 +137,11 @@ jobs:
           aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region:            us-east-1
 
-      - name: Instalar dependencias
-        run: pip install -r requirements.txt
+      - name: Crear virtualenv e instalar dependencias
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
         working-directory: lambda_api
 
       - name: Inyectar secrets en zappa_settings.json
@@ -162,5 +163,7 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
       - name: Zappa deploy o update
-        run: zappa update production || zappa deploy production
+        run: |
+          source venv/bin/activate
+          zappa update production || zappa deploy production
         working-directory: lambda_api
