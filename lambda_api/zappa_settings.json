@@ -1,0 +1,21 @@
+{
+  "production": {
+    "app_function": "app.app",
+    "aws_region": "us-east-1",
+    "profile_name": null,
+    "project_name": "shopstream-api",
+    "runtime": "python3.11",
+    "s3_bucket": "shopstream-915741505963",
+    "memory_size": 256,
+    "timeout_seconds": 30,
+    "environment_variables": {
+      "DB_HOST": "PLACEHOLDER",
+      "DB_PORT": "5432",
+      "DB_NAME": "shopstream_dw",
+      "DB_USER": "PLACEHOLDER",
+      "DB_PASSWORD": "PLACEHOLDER"
+    },
+    "keep_warm": false,
+    "log_level": "WARNING"
+  }
+}

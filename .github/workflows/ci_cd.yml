@@ -1,0 +1,159 @@
+name: CI/CD ShopStream
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Job 1: Tests ─────────────────────────────────────────────────────────────
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install faker numpy pytest boto3 moto[s3,cloudwatch] flask psycopg2-binary
+
+      - name: Correr todos los tests
+        run: |
+          pytest data_generation/tests/ lambda_ingest/tests/ lambda_api/tests/ -v
+
+  # ── Job 2: Generar datos y subir a S3 ────────────────────────────────────────
+  generate_and_upload:
+    name: Generar datos sinteticos
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install faker numpy boto3
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region:            us-east-1
+
+      - name: Generar datos del dia de hoy
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          echo "Generando datos para $DATE"
+          python data_generation/generate_events.py \
+            --date $DATE \
+            --output ./output \
+            --records 500000
+
+      - name: Subir a S3
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          python data_generation/upload_to_s3.py \
+            --date $DATE \
+            --input ./output \
+            --bucket ${{ secrets.S3_BUCKET }}
+
+  # ── Job 3: Deploy Lambda ingest ──────────────────────────────────────────────
+  deploy_lambda_ingest:
+    name: Deploy Lambda ingest
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region:            us-east-1
+
+      - name: Empaquetar Lambda
+        run: |
+          cd lambda_ingest
+          pip install -r requirements.txt -t package/ -q
+          cp handler.py validators.py package/
+          cd package && zip -r ../lambda_ingest.zip . -q
+          cd ..
+          echo "ZIP: $(du -sh lambda_ingest.zip | cut -f1)"
+
+      - name: Actualizar Lambda en AWS
+        run: |
+          aws lambda update-function-code \
+            --function-name shopstream-ingest \
+            --zip-file fileb://lambda_ingest/lambda_ingest.zip
+
+  # ── Job 4: Deploy API con Zappa ──────────────────────────────────────────────
+  deploy_api:
+    name: Deploy API Zappa
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region:            us-east-1
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+        working-directory: lambda_api
+
+      - name: Inyectar secrets en zappa_settings.json
+        run: |
+          python3 - << 'PYEOF'
+          import json, os
+          with open("zappa_settings.json") as f:
+              s = json.load(f)
+          s["production"]["environment_variables"]["DB_HOST"]     = os.environ["DB_HOST"]
+          s["production"]["environment_variables"]["DB_USER"]     = os.environ["DB_USER"]
+          s["production"]["environment_variables"]["DB_PASSWORD"] = os.environ["DB_PASSWORD"]
+          with open("zappa_settings.json", "w") as f:
+              json.dump(s, f, indent=2)
+          PYEOF
+        working-directory: lambda_api
+        env:
+          DB_HOST:     ${{ secrets.DB_HOST }}
+          DB_USER:     ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Zappa deploy o update
+        run: zappa update production || zappa deploy production
+        working-directory: lambda_api

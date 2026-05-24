@@ -1,0 +1,52 @@
+name: Deploy API
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "lambda_api/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            us-east-1
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+        working-directory: lambda_api
+
+      - name: Inyectar secrets en zappa_settings.json
+        run: |
+          python3 - << 'PYEOF'
+          import json
+          with open("zappa_settings.json") as f:
+              s = json.load(f)
+          import os
+          s["production"]["environment_variables"]["DB_HOST"]     = os.environ["DB_HOST"]
+          s["production"]["environment_variables"]["DB_USER"]     = os.environ["DB_USER"]
+          s["production"]["environment_variables"]["DB_PASSWORD"] = os.environ["DB_PASSWORD"]
+          with open("zappa_settings.json", "w") as f:
+              json.dump(s, f, indent=2)
+          PYEOF
+        working-directory: lambda_api
+        env:
+          DB_HOST:     ${{ secrets.DB_HOST }}
+          DB_USER:     ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Zappa deploy o update
+        run: zappa update production || zappa deploy production
+        working-directory: lambda_api
