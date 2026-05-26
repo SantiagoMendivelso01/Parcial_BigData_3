@@ -1,6 +1,6 @@
 """
 generate_events.py
-Genera dataset sintético de eventos de comportamiento para ShopStream.
+Genera dataset sintético h de eventos de comportamiento para ShopStream.
 Produce >= 500,000 registros diarios con distribuciones realistas.
 
 Uso:
