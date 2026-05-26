@@ -21,46 +21,78 @@ def create_spark():
 
 
 def zscore_anomalies(df, col_name, threshold=3.0):
-    stats = df.agg(
-        F.mean(col_name).alias("mean"),
-        F.stddev(col_name).alias("std"),
-    ).collect()[0]
+    try:
+        stats = df.agg(
+            F.mean(col_name).alias("mean"),
+            F.stddev(col_name).alias("std"),
+            F.count(col_name).alias("cnt")
+        ).collect()[0]
 
-    mean_val = stats["mean"]
-    std_val  = stats["std"]
+        mean_val = stats["mean"]
+        std_val  = stats["std"]
+        cnt      = stats["cnt"]
 
-    if std_val is None or std_val == 0:
-        return df.limit(0)
+        if std_val is None or std_val == 0 or cnt < 10:
+            print(f"  [SKIP] zscore en {col_name}: std={std_val}, cnt={cnt}")
+            return df.limit(0).withColumn("z_score", F.lit(0.0).cast(DoubleType())) \
+                     .withColumn("anomaly_type", F.lit("")) \
+                     .withColumn("anomaly_field", F.lit("")) \
+                     .withColumn("anomaly_value", F.lit(0.0).cast(DoubleType()))
 
-    return (
-        df
-        .withColumn("z_score", F.abs((F.col(col_name) - F.lit(mean_val)) / F.lit(std_val)).cast(DoubleType()))
-        .filter(F.col("z_score") > threshold)
-        .withColumn("anomaly_type",  F.lit(f"zscore_{col_name}"))
-        .withColumn("anomaly_field", F.lit(col_name))
-        .withColumn("anomaly_value", F.col(col_name).cast(DoubleType()))
-    )
+        return (
+            df
+            .withColumn("z_score", F.abs((F.col(col_name) - F.lit(mean_val)) / F.lit(std_val)).cast(DoubleType()))
+            .filter(F.col("z_score") > threshold)
+            .withColumn("anomaly_type",  F.lit(f"zscore_{col_name}"))
+            .withColumn("anomaly_field", F.lit(col_name))
+            .withColumn("anomaly_value", F.col(col_name).cast(DoubleType()))
+        )
+    except Exception as e:
+        print(f"  [ERROR] zscore en {col_name}: {e}")
+        return df.limit(0).withColumn("z_score", F.lit(0.0).cast(DoubleType())) \
+                 .withColumn("anomaly_type", F.lit("")) \
+                 .withColumn("anomaly_field", F.lit("")) \
+                 .withColumn("anomaly_value", F.lit(0.0).cast(DoubleType()))
 
 
 def iqr_anomalies(df, col_name, factor=3.0):
-    quantiles = df.approxQuantile(col_name, [0.25, 0.75], 0.01)
-    q1, q3    = quantiles[0], quantiles[1]
-    iqr       = q3 - q1
+    try:
+        cnt = df.count()
+        if cnt < 10:
+            print(f"  [SKIP] iqr en {col_name}: solo {cnt} registros")
+            return df.limit(0).withColumn("z_score", F.lit(0.0).cast(DoubleType())) \
+                     .withColumn("anomaly_type", F.lit("")) \
+                     .withColumn("anomaly_field", F.lit("")) \
+                     .withColumn("anomaly_value", F.lit(0.0).cast(DoubleType()))
 
-    if iqr == 0:
-        return df.limit(0)
+        quantiles = df.approxQuantile(col_name, [0.25, 0.75], 0.01)
+        q1, q3    = quantiles[0], quantiles[1]
+        iqr       = q3 - q1
 
-    lower = q1 - factor * iqr
-    upper = q3 + factor * iqr
+        if iqr == 0:
+            print(f"  [SKIP] iqr en {col_name}: IQR=0")
+            return df.limit(0).withColumn("z_score", F.lit(0.0).cast(DoubleType())) \
+                     .withColumn("anomaly_type", F.lit("")) \
+                     .withColumn("anomaly_field", F.lit("")) \
+                     .withColumn("anomaly_value", F.lit(0.0).cast(DoubleType()))
 
-    return (
-        df
-        .filter((F.col(col_name) < lower) | (F.col(col_name) > upper))
-        .withColumn("z_score", F.abs((F.col(col_name) - F.lit((q1 + q3) / 2)) / F.lit(iqr / 2)).cast(DoubleType()))
-        .withColumn("anomaly_type",  F.lit(f"iqr_{col_name}"))
-        .withColumn("anomaly_field", F.lit(col_name))
-        .withColumn("anomaly_value", F.col(col_name).cast(DoubleType()))
-    )
+        lower = q1 - factor * iqr
+        upper = q3 + factor * iqr
+
+        return (
+            df
+            .filter((F.col(col_name) < lower) | (F.col(col_name) > upper))
+            .withColumn("z_score", F.abs((F.col(col_name) - F.lit((q1 + q3) / 2)) / F.lit(iqr / 2)).cast(DoubleType()))
+            .withColumn("anomaly_type",  F.lit(f"iqr_{col_name}"))
+            .withColumn("anomaly_field", F.lit(col_name))
+            .withColumn("anomaly_value", F.col(col_name).cast(DoubleType()))
+        )
+    except Exception as e:
+        print(f"  [ERROR] iqr en {col_name}: {e}")
+        return df.limit(0).withColumn("z_score", F.lit(0.0).cast(DoubleType())) \
+                 .withColumn("anomaly_type", F.lit("")) \
+                 .withColumn("anomaly_field", F.lit("")) \
+                 .withColumn("anomaly_value", F.lit(0.0).cast(DoubleType()))
 
 
 def main():
@@ -81,7 +113,11 @@ def main():
     df_pv    = spark.read.parquet(pv_path)
     df_click = spark.read.parquet(cl_path)
 
+    print(f"  page_views: {df_pv.count()} registros")
+    print(f"  clicks: {df_click.count()} registros")
+
     # Anomalias en tiempo de pagina
+    print("Detectando anomalias en tiempo de pagina...")
     time_anom = (
         zscore_anomalies(df_pv, "time_on_page_seconds")
         .select("session_id", "user_id", "page_url", "page_type",
@@ -89,6 +125,7 @@ def main():
     )
 
     # Sesiones con demasiados clicks
+    print("Detectando anomalias en clicks por sesion...")
     click_per_session = (
         df_click
         .groupBy("session_id", "user_id")
@@ -97,25 +134,29 @@ def main():
     click_anom = (
         iqr_anomalies(click_per_session, "click_count")
         .select("session_id", "user_id",
-                F.lit(None).alias("page_url"),
-                F.lit(None).alias("page_type"),
+                F.lit(None).cast("string").alias("page_url"),
+                F.lit(None).cast("string").alias("page_type"),
                 "z_score", "anomaly_type", "anomaly_field", "anomaly_value")
     )
 
+    # Unir anomalias
     all_anomalies = (
         time_anom.unionByName(click_anom)
+        .filter(F.col("anomaly_type") != "")
         .withColumn("event_date",  F.lit(args.date))
         .withColumn("detected_at", F.current_timestamp())
         .dropDuplicates(["session_id", "anomaly_type"])
     )
 
     total = all_anomalies.count()
-    print(f"Total anomalias: {total:,}")
-    all_anomalies.groupBy("anomaly_type").count().show()
+    print(f"\nTotal anomalias detectadas: {total:,}")
+
+    if total > 0:
+        all_anomalies.groupBy("anomaly_type").count().show()
 
     out = f"s3://{args.bucket}/processed/metrics/anomalies/year={dt.year}/month={dt.month:02d}/day={dt.day:02d}"
     all_anomalies.write.mode("overwrite").parquet(out)
-    print(f"OK anomalies exportadas -> {out}")
+    print(f"OK anomalias exportadas -> {out}")
 
     spark.stop()
 

@@ -167,3 +167,23 @@ jobs:
           source venv/bin/activate
           zappa update production || zappa deploy production
         working-directory: lambda_api
+
+  deploy_dashboard:
+    name: Deploy Dashboard GitHub Pages
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy a GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./
+          publish_branch: gh-pages
+          include_files: dashboard.html
