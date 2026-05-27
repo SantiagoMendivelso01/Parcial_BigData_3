@@ -4,38 +4,45 @@ from db import query_to_list
 
 anomalies_bp = Blueprint("anomalies", __name__)
 
+
 @anomalies_bp.route("/anomalies")
 def list_anomalies():
-    date         = request.args.get("date", str(date_type.today()))
-    anomaly_type = request.args.get("type", None)
-    min_zscore   = request.args.get("min_zscore", "0")
+    date         = request.args.get("date",      "") or None
+    anomaly_type = request.args.get("type",      None)
+    min_zscore   = request.args.get("min_zscore","0")
 
-    try:
-        date_type.fromisoformat(date)
-    except ValueError:
-        abort(400, description="date debe tener formato YYYY-MM-DD")
+    if date:
+        try:
+            date_type.fromisoformat(date)
+        except ValueError:
+            abort(400, description="date debe tener formato YYYY-MM-DD")
 
     try:
         min_zscore_f = float(min_zscore)
     except ValueError:
         abort(400, description="min_zscore debe ser numero")
 
-    filters = ["event_date = %s", "z_score >= %s"]
-    params  = [date, min_zscore_f]
+    filters = ["z_score >= %s"]
+    params  = [min_zscore_f]
 
+    if date:
+        filters.append("event_date = %s")
+        params.append(date)
     if anomaly_type:
         filters.append("anomaly_type = %s")
         params.append(anomaly_type)
 
-    where = " AND ".join(filters)
+    where = "WHERE " + " AND ".join(filters)
+
     sql = f"""
         SELECT session_id, user_id, page_url, page_type,
-               ROUND(z_score::numeric, 4) AS z_score,
+               ROUND(z_score::numeric, 4)       AS z_score,
                anomaly_type, anomaly_field,
                ROUND(anomaly_value::numeric, 2) AS anomaly_value,
+               event_date::text                 AS event_date,
                detected_at
         FROM anomalies
-        WHERE {where}
+        {where}
         ORDER BY z_score DESC
         LIMIT 500
     """
@@ -48,9 +55,9 @@ def list_anomalies():
         type_counts[t] = type_counts.get(t, 0) + 1
 
     return jsonify({
-        "date": date,
+        "date":    date,
         "filters": {"type": anomaly_type, "min_zscore": min_zscore_f},
-        "total": len(rows),
+        "total":   len(rows),
         "by_type": type_counts,
-        "data": rows,
+        "data":    rows,
     })

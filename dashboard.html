@@ -11,63 +11,49 @@
   header { background: linear-gradient(135deg, #1a1f2e, #2d3748); padding: 20px 28px; border-bottom: 1px solid #2d3748; display: flex; align-items: center; gap: 14px; }
   header h1 { font-size: 22px; font-weight: 700; color: #63b3ed; }
   header p  { font-size: 12px; color: #718096; margin-top: 2px; }
-
   .controls { padding: 16px 28px; background: #1a1f2e; border-bottom: 1px solid #2d3748; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
   .controls label { font-size: 12px; color: #a0aec0; white-space: nowrap; }
-  .controls select, .controls input {
-    background: #2d3748; border: 1px solid #4a5568; color: #e2e8f0;
-    padding: 7px 10px; border-radius: 6px; font-size: 13px;
-  }
+  .controls select, .controls input { background: #2d3748; border: 1px solid #4a5568; color: #e2e8f0; padding: 7px 10px; border-radius: 6px; font-size: 13px; }
   .btn { background: #3182ce; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; }
   .btn:hover { background: #2b6cb0; }
   .btn:disabled { background: #4a5568; cursor: not-allowed; }
-
+  .btn-secondary { background: #2d3748; color: #a0aec0; border: 1px solid #4a5568; }
+  .btn-secondary:hover { background: #4a5568; }
   .summary-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; padding: 20px 28px 0; }
   .summary-item { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; padding: 14px 18px; text-align: center; }
   .summary-number { font-size: 26px; font-weight: 700; color: #63b3ed; }
   .summary-label  { font-size: 11px; color: #718096; margin-top: 4px; }
-
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; padding: 20px 28px; }
-  .grid-full { grid-column: 1 / -1; }
-
   .card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 12px; overflow: hidden; }
   .card-header { padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d3748; gap: 8px; }
   .card-title { font-size: 14px; font-weight: 600; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card-body { padding: 14px 18px; overflow-x: auto; }
-
   .status-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
   .status-ok      { background: #1c4532; color: #68d391; border: 1px solid #276749; }
   .status-error   { background: #742a2a; color: #fc8181; border: 1px solid #9b2c2c; }
   .status-loading { background: #2a4365; color: #63b3ed; border: 1px solid #2c5282; }
   .status-pending { background: #2d3748; color: #a0aec0; border: 1px solid #4a5568; }
-
   .endpoint-url { font-size: 10px; color: #4a5568; font-family: monospace; margin-bottom: 10px; word-break: break-all; }
-
   table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 300px; }
   th { text-align: left; padding: 7px 8px; color: #718096; font-weight: 600; font-size: 10px; text-transform: uppercase; border-bottom: 1px solid #2d3748; white-space: nowrap; }
-  td { padding: 7px 8px; border-bottom: 1px solid #1e2535; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td { padding: 7px 8px; border-bottom: 1px solid #1e2535; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #222836; }
-
   .metric-value { font-weight: 600; color: #63b3ed; }
   .tag { display: inline-block; background: #2d3748; color: #a0aec0; padding: 2px 6px; border-radius: 4px; font-size: 10px; white-space: nowrap; }
-
   .anomaly-score { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700; }
   .score-high   { background: #742a2a; color: #fc8181; }
   .score-medium { background: #7b341e; color: #f6ad55; }
   .score-low    { background: #1c4532; color: #68d391; }
-
   .empty { text-align: center; color: #4a5568; padding: 28px; font-size: 13px; }
   .response-time { font-size: 10px; color: #4a5568; margin-top: 6px; }
-
-  .chart-container { position: relative; height: 220px; margin-top: 8px; }
-
+  .chart-container { position: relative; height: 200px; margin-top: 12px; }
   .bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
   .bar-label { font-size: 11px; color: #a0aec0; width: 80px; flex-shrink: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .bar-bg { flex: 1; background: #2d3748; border-radius: 4px; height: 18px; overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 6px; transition: width 0.5s; }
   .bar-val { font-size: 10px; font-weight: 700; color: white; white-space: nowrap; }
-
+  .filter-info { font-size: 11px; color: #4a5568; padding: 4px 0 8px; }
   @media (max-width: 600px) {
     .summary-bar { grid-template-columns: repeat(2, 1fr); }
     .controls { gap: 8px; }
@@ -87,11 +73,11 @@
 
 <div class="controls">
   <label>Fecha:</label>
-  <select id="dateInput"><option>Cargando...</option></select>
+  <select id="dateInput" onchange="loadAll()"><option value="">Todas</option></select>
   <label>País:</label>
-  <input type="text" id="countryInput" value="CO" style="width:70px">
+  <select id="countryInput" onchange="loadAll()"><option value="">Todos</option></select>
   <label>Dispositivo:</label>
-  <select id="deviceInput">
+  <select id="deviceInput" onchange="loadAll()">
     <option value="">Todos</option>
     <option value="mobile">Mobile</option>
     <option value="desktop">Desktop</option>
@@ -99,19 +85,18 @@
   </select>
   <label>Límite:</label>
   <input type="number" id="limitInput" value="10" min="1" max="50" style="width:65px">
-  <button class="btn" id="loadBtn" onclick="loadAll()">🔄 Cargar datos</button>
+  <button class="btn" onclick="loadAll()">🔄 Actualizar</button>
+  <button class="btn btn-secondary" onclick="clearFilters()">✕ Limpiar filtros</button>
 </div>
 
 <div class="summary-bar">
   <div class="summary-item"><div class="summary-number" id="sumSessions">—</div><div class="summary-label">Total Sesiones</div></div>
   <div class="summary-item"><div class="summary-number" id="sumAnomalies">—</div><div class="summary-label">Anomalías</div></div>
   <div class="summary-item"><div class="summary-number" id="sumPages">—</div><div class="summary-label">Páginas Top</div></div>
-  <div class="summary-item"><div class="summary-number" id="sumConversion">—</div><div class="summary-label">% Conversión</div></div>
+  <div class="summary-item"><div class="summary-number" id="sumDates">—</div><div class="summary-label">Fechas con datos</div></div>
 </div>
 
 <div class="grid">
-
-  <!-- Top páginas tabla + chart -->
   <div class="card">
     <div class="card-header">
       <div class="card-title">⏱️ Top Páginas — Tiempo de Permanencia</div>
@@ -119,13 +104,12 @@
     </div>
     <div class="card-body">
       <div class="endpoint-url" id="url1">—</div>
-      <div id="content1"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div id="content1"><div class="empty">Cargando...</div></div>
       <div class="chart-container"><canvas id="chart1"></canvas></div>
       <div class="response-time" id="time1"></div>
     </div>
   </div>
 
-  <!-- Tasa de rebote chart -->
   <div class="card">
     <div class="card-header">
       <div class="card-title">📉 Tasa de Rebote por Tipo de Página</div>
@@ -133,13 +117,12 @@
     </div>
     <div class="card-body">
       <div class="endpoint-url" id="url2">—</div>
-      <div id="content2"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div id="content2"><div class="empty">Cargando...</div></div>
       <div class="chart-container"><canvas id="chart2"></canvas></div>
       <div class="response-time" id="time2"></div>
     </div>
   </div>
 
-  <!-- Sesiones por dispositivo chart -->
   <div class="card">
     <div class="card-header">
       <div class="card-title">🌎 Sesiones por País y Dispositivo</div>
@@ -147,13 +130,12 @@
     </div>
     <div class="card-body">
       <div class="endpoint-url" id="url3">—</div>
-      <div id="content3"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div id="content3"><div class="empty">Cargando...</div></div>
       <div class="chart-container"><canvas id="chart3"></canvas></div>
       <div class="response-time" id="time3"></div>
     </div>
   </div>
 
-  <!-- Anomalías -->
   <div class="card">
     <div class="card-header">
       <div class="card-title">🚨 Anomalías Detectadas</div>
@@ -161,49 +143,40 @@
     </div>
     <div class="card-body">
       <div class="endpoint-url" id="url4">—</div>
-      <div id="content4"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div id="content4"><div class="empty">Cargando...</div></div>
       <div class="chart-container"><canvas id="chart4"></canvas></div>
       <div class="response-time" id="time4"></div>
     </div>
   </div>
-
 </div>
 
 <script>
-const API = "https://lnivpuaw80.execute-api.us-east-1.amazonaws.com/production";
+const API    = "https://lnivpuaw80.execute-api.us-east-1.amazonaws.com/production";
 const charts = {};
-
-function destroyChart(id) {
-  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
-}
+let   allDates = [];
 
 function getDate()    { return document.getElementById("dateInput").value; }
-function getCountry() { return document.getElementById("countryInput").value.toUpperCase(); }
+function getCountry() { return document.getElementById("countryInput").value; }
 function getDevice()  { return document.getElementById("deviceInput").value; }
 function getLimit()   { return document.getElementById("limitInput").value; }
+
+function clearFilters() {
+  document.getElementById("dateInput").value    = "";
+  document.getElementById("countryInput").value = "";
+  document.getElementById("deviceInput").value  = "";
+  loadAll();
+}
 
 function setStatus(id, status, code) {
   const el = document.getElementById("status" + id);
   el.className = "status-badge";
-  if (status === "ok")    { el.classList.add("status-ok");      el.textContent = "✓ " + code; }
-  else if (status === "error") { el.classList.add("status-error"); el.textContent = "✗ " + code; }
-  else                    { el.classList.add("status-loading"); el.textContent = "Cargando..."; }
+  if (status === "ok")         { el.classList.add("status-ok");      el.textContent = "✓ " + code; }
+  else if (status === "error") { el.classList.add("status-error");   el.textContent = "✗ " + code; }
+  else                         { el.classList.add("status-loading"); el.textContent = "Cargando..."; }
 }
 
-async function loadDates() {
-  try {
-    const res  = await fetch(API + "/dates");
-    const data = await res.json();
-    const sel  = document.getElementById("dateInput");
-    sel.innerHTML = "";
-    data.dates.forEach(function(d) {
-      const opt = document.createElement("option");
-      opt.value = d; opt.textContent = d;
-      sel.appendChild(opt);
-    });
-  } catch(e) {
-    document.getElementById("dateInput").innerHTML = '<option value="2024-01-15">2024-01-15</option>';
-  }
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
 }
 
 async function fetchAPI(url, cardId) {
@@ -225,55 +198,84 @@ async function fetchAPI(url, cardId) {
   }
 }
 
+async function loadFilters() {
+  // Cargar fechas
+  try {
+    const res  = await fetch(API + "/dates");
+    const data = await res.json();
+    allDates   = data.dates || [];
+    const sel  = document.getElementById("dateInput");
+    const cur  = sel.value;
+    sel.innerHTML = '<option value="">Todas las fechas (' + allDates.length + ')</option>';
+    allDates.forEach(function(d) {
+      const opt = document.createElement("option");
+      opt.value = d; opt.textContent = d;
+      if (d === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    document.getElementById("sumDates").textContent = allDates.length;
+  } catch(e) { console.warn("Error cargando fechas:", e); }
+
+  // Cargar países
+  try {
+    const res  = await fetch(API + "/filters");
+    const data = await res.json();
+    const sel  = document.getElementById("countryInput");
+    const cur  = sel.value;
+    sel.innerHTML = '<option value="">Todos los países</option>';
+    (data.countries || []).forEach(function(c) {
+      const opt = document.createElement("option");
+      opt.value = c; opt.textContent = c;
+      if (c === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.warn("Error cargando países:", e); }
+}
+
+function buildUrl(base, params) {
+  const parts = [];
+  Object.keys(params).forEach(function(k) {
+    if (params[k]) parts.push(k + "=" + encodeURIComponent(params[k]));
+  });
+  return base + (parts.length ? "?" + parts.join("&") : "");
+}
+
 async function loadTopPages() {
-  const url  = API + "/pages/top?metric=time_on_page&date=" + getDate() + "&limit=" + getLimit();
+  const url  = buildUrl(API + "/pages/top", { metric: "time_on_page", date: getDate(), limit: getLimit() });
   const data = await fetchAPI(url, 1);
   if (!data || !data.data || !data.data.length) {
     document.getElementById("content1").innerHTML = '<div class="empty">Sin datos</div>';
     destroyChart("chart1"); return;
   }
   document.getElementById("sumPages").textContent = data.count;
-
-  // Tabla
-  let html = '<table><tr><th>Página</th><th>Tipo</th><th>Avg seg</th><th>Visitas</th></tr>';
+  let html = '<div class="filter-info">Mostrando ' + data.count + ' páginas' + (getDate() ? ' — ' + getDate() : ' — todas las fechas') + '</div>';
+  html += '<table><tr><th>Página</th><th>Tipo</th><th>Avg seg</th><th>Visitas</th></tr>';
   data.data.forEach(function(r) {
     html += '<tr><td title="' + r.page_url + '" style="font-family:monospace;font-size:10px">' + r.page_url + '</td><td><span class="tag">' + r.page_type + '</span></td><td class="metric-value">' + parseFloat(r.avg_time_seconds).toFixed(1) + '</td><td>' + r.total_visits + '</td></tr>';
   });
   html += '</table>';
   document.getElementById("content1").innerHTML = html;
-
-  // Chart barras horizontales
   destroyChart("chart1");
-  const labels = data.data.map(function(r) { return r.page_url.replace("/producto/","").replace("/categoria/",""); });
+  const labels = data.data.map(function(r) { return r.page_url.replace("/producto/","p:").replace("/categoria/","cat:").replace("/checkout","chk"); });
   const values = data.data.map(function(r) { return parseFloat(r.avg_time_seconds); });
   charts["chart1"] = new Chart(document.getElementById("chart1"), {
     type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{ label: "Avg segundos", data: values, backgroundColor: "#3182ce99", borderColor: "#63b3ed", borderWidth: 1, borderRadius: 4 }]
-    },
-    options: {
-      indexAxis: "y", responsive: true, maintainAspectRatio: false,
+    data: { labels: labels, datasets: [{ label: "Avg seg", data: values, backgroundColor: "#3182ce99", borderColor: "#63b3ed", borderWidth: 1, borderRadius: 4 }] },
+    options: { indexAxis: "y", responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: "#718096", font: { size: 10 } }, grid: { color: "#2d3748" } },
-        y: { ticks: { color: "#a0aec0", font: { size: 9 } }, grid: { color: "#2d3748" } }
-      }
-    }
+      scales: { x: { ticks: { color: "#718096", font: { size: 10 } }, grid: { color: "#2d3748" } }, y: { ticks: { color: "#a0aec0", font: { size: 9 } }, grid: { color: "#2d3748" } } } }
   });
 }
 
 async function loadBounceRate() {
-  const url  = API + "/pages/top?metric=bounce_rate&date=" + getDate() + "&limit=10";
+  const url  = buildUrl(API + "/pages/top", { metric: "bounce_rate", date: getDate(), limit: 10 });
   const data = await fetchAPI(url, 2);
   if (!data || !data.data || !data.data.length) {
     document.getElementById("content2").innerHTML = '<div class="empty">Sin datos</div>';
     destroyChart("chart2"); return;
   }
-
-  // Barras de rebote
-  let html = "";
   const max = Math.max.apply(null, data.data.map(function(r){ return parseFloat(r.bounce_rate_pct); }));
+  let html = '<div class="filter-info">' + (getDate() ? getDate() : "Todas las fechas") + '</div>';
   data.data.forEach(function(r) {
     const pct   = parseFloat(r.bounce_rate_pct);
     const color = pct > 80 ? "#fc8181" : pct > 50 ? "#f6ad55" : "#68d391";
@@ -281,8 +283,6 @@ async function loadBounceRate() {
     html += '<div class="bar-row"><div class="bar-label" title="' + r.page_type + '">' + r.page_type + '</div><div class="bar-bg"><div class="bar-fill" style="width:' + w + '%;background:' + color + '"><span class="bar-val">' + pct.toFixed(1) + '%</span></div></div></div>';
   });
   document.getElementById("content2").innerHTML = html;
-
-  // Doughnut chart
   destroyChart("chart2");
   const labels = data.data.map(function(r){ return r.page_type; });
   const values = data.data.map(function(r){ return parseFloat(r.bounce_rate_pct); });
@@ -290,19 +290,13 @@ async function loadBounceRate() {
   charts["chart2"] = new Chart(document.getElementById("chart2"), {
     type: "doughnut",
     data: { labels: labels, datasets: [{ data: values, backgroundColor: colors, borderColor: "#1a1f2e", borderWidth: 2 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: "right", labels: { color: "#a0aec0", font: { size: 10 }, boxWidth: 12 } }
-      }
-    }
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "right", labels: { color: "#a0aec0", font: { size: 10 }, boxWidth: 12 } } } }
   });
 }
 
 async function loadSessions() {
-  let url = API + "/sessions/summary?date=" + getDate();
-  if (getCountry()) url += "&country=" + getCountry();
-  if (getDevice())  url += "&device="  + getDevice();
+  const url  = buildUrl(API + "/sessions/summary", { date: getDate(), country: getCountry(), device: getDevice() });
   const data = await fetchAPI(url, 3);
   if (!data) return;
   document.getElementById("sumSessions").textContent = (data.total_sessions || 0).toLocaleString();
@@ -310,47 +304,37 @@ async function loadSessions() {
     document.getElementById("content3").innerHTML = '<div class="empty">Sin datos para este filtro</div>';
     destroyChart("chart3"); return;
   }
-
-  let html = '<div style="font-size:11px;color:#a0aec0;margin-bottom:8px">Sesiones: <strong style="color:#63b3ed">' + data.total_sessions.toLocaleString() + '</strong> | Usuarios: <strong style="color:#63b3ed">' + data.total_users.toLocaleString() + '</strong></div>';
+  let html = '<div class="filter-info">Sesiones: <strong style="color:#63b3ed">' + data.total_sessions.toLocaleString() + '</strong> | Usuarios: <strong style="color:#63b3ed">' + data.total_users.toLocaleString() + '</strong></div>';
   html += '<table><tr><th>Dispositivo</th><th>País</th><th>Sesiones</th><th>Usuarios</th><th>Avg seg</th></tr>';
   data.data.forEach(function(r) {
     html += '<tr><td><span class="tag">' + r.device_type + '</span></td><td><strong>' + r.country + '</strong></td><td class="metric-value">' + r.total_sessions.toLocaleString() + '</td><td>' + r.unique_users.toLocaleString() + '</td><td>' + parseFloat(r.avg_time_seconds || 0).toFixed(1) + '</td></tr>';
   });
   html += '</table>';
   document.getElementById("content3").innerHTML = html;
-
-  // Chart barras sesiones por dispositivo
   destroyChart("chart3");
   const byDevice = {};
-  data.data.forEach(function(r) {
-    byDevice[r.device_type] = (byDevice[r.device_type] || 0) + r.total_sessions;
-  });
+  data.data.forEach(function(r) { byDevice[r.device_type] = (byDevice[r.device_type] || 0) + r.total_sessions; });
   const devLabels = Object.keys(byDevice);
   const devValues = devLabels.map(function(k){ return byDevice[k]; });
-  const devColors = ["#63b3ed", "#68d391", "#f6ad55"];
   charts["chart3"] = new Chart(document.getElementById("chart3"), {
     type: "pie",
-    data: { labels: devLabels, datasets: [{ data: devValues, backgroundColor: devColors, borderColor: "#1a1f2e", borderWidth: 2 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: "right", labels: { color: "#a0aec0", font: { size: 11 }, boxWidth: 12 } } }
-    }
+    data: { labels: devLabels, datasets: [{ data: devValues, backgroundColor: ["#63b3ed","#68d391","#f6ad55"], borderColor: "#1a1f2e", borderWidth: 2 }] },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: "right", labels: { color: "#a0aec0", font: { size: 11 }, boxWidth: 12 } } } }
   });
 }
 
 async function loadAnomalies() {
-  const url  = API + "/anomalies?date=" + getDate();
+  const url  = buildUrl(API + "/anomalies", { date: getDate() });
   const data = await fetchAPI(url, 4);
   if (!data) return;
   document.getElementById("sumAnomalies").textContent = (data.total || 0).toLocaleString();
-
   if (!data.data || !data.data.length) {
     document.getElementById("content4").innerHTML = '<div class="empty">Sin anomalías</div>';
     destroyChart("chart4"); return;
   }
-
-  // Resumen por tipo
-  let html = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">';
+  let html = '<div class="filter-info">' + data.total + ' anomalías' + (getDate() ? ' — ' + getDate() : ' — todas las fechas') + '</div>';
+  html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">';
   Object.keys(data.by_type).forEach(function(t) {
     html += '<span class="tag">' + t.replace("zscore_","z:").replace("iqr_","iqr:") + ': <strong style="color:#63b3ed">' + data.by_type[t] + '</strong></span>';
   });
@@ -364,45 +348,25 @@ async function loadAnomalies() {
   if (data.total > 10) html += '<tr><td colspan="4" style="text-align:center;color:#4a5568;font-size:11px">... y ' + (data.total - 10) + ' más</td></tr>';
   html += '</table>';
   document.getElementById("content4").innerHTML = html;
-
-  // Chart: anomalías por tipo
   destroyChart("chart4");
   const aLabels = Object.keys(data.by_type).map(function(t){ return t.replace("zscore_","z:").replace("iqr_","iqr:"); });
   const aValues = Object.values(data.by_type);
   charts["chart4"] = new Chart(document.getElementById("chart4"), {
     type: "bar",
-    data: {
-      labels: aLabels,
-      datasets: [{ label: "Cantidad", data: aValues, backgroundColor: ["#fc818199","#f6ad5599","#68d39199","#63b3ed99"], borderColor: ["#fc8181","#f6ad55","#68d391","#63b3ed"], borderWidth: 1, borderRadius: 4 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
+    data: { labels: aLabels, datasets: [{ label: "Cantidad", data: aValues, backgroundColor: ["#fc818199","#f6ad5599","#68d39199","#63b3ed99"], borderColor: ["#fc8181","#f6ad55","#68d391","#63b3ed"], borderWidth: 1, borderRadius: 4 }] },
+    options: { responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { color: "#a0aec0", font: { size: 10 } }, grid: { color: "#2d3748" } },
-        y: { ticks: { color: "#718096", font: { size: 10 } }, grid: { color: "#2d3748" } }
-      }
-    }
+      scales: { x: { ticks: { color: "#a0aec0", font: { size: 10 } }, grid: { color: "#2d3748" } }, y: { ticks: { color: "#718096", font: { size: 10 } }, grid: { color: "#2d3748" } } } }
   });
-
-  // Conversión (dummy desde anomalías para mostrar el KPI)
-  document.getElementById("sumConversion").textContent = data.total > 0 ? (100 - Math.min(data.total / 10, 99)).toFixed(1) + "%" : "—";
 }
 
 async function loadAll() {
-  const btn = document.getElementById("loadBtn");
-  btn.disabled = true; btn.textContent = "⏳ Cargando...";
-  document.getElementById("sumSessions").textContent  = "—";
-  document.getElementById("sumAnomalies").textContent = "—";
-  document.getElementById("sumPages").textContent     = "—";
-  document.getElementById("sumConversion").textContent= "—";
   await Promise.all([loadTopPages(), loadBounceRate(), loadSessions(), loadAnomalies()]);
-  btn.disabled = false; btn.textContent = "🔄 Cargar datos";
 }
 
 window.onload = async function() {
-  await loadDates();
-  loadAll();
+  await loadFilters();
+  await loadAll();
 };
 </script>
 </body>
