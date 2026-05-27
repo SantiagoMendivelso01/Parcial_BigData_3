@@ -1,0 +1,19 @@
+{
+  "event_type": "click",
+  "required_fields": ["user_id", "session_id", "element_id", "element_type", "page_url", "timestamp", "x_position", "y_position"],
+  "field_types": {
+    "user_id": "string",
+    "session_id": "string",
+    "element_id": "string",
+    "element_type": "string",
+    "page_url": "string",
+    "timestamp": "iso8601",
+    "x_position": "integer",
+    "y_position": "integer"
+  },
+  "field_ranges": {
+    "x_position": {"min": 0, "max": 3840},
+    "y_position": {"min": 0, "max": 2160},
+    "element_type": {"enum": ["button", "link", "image", "product_card", "menu", "banner", "search_result"]}
+  }
+}

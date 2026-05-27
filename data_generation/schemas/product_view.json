@@ -1,0 +1,18 @@
+{
+  "event_type": "product_view",
+  "required_fields": ["user_id", "session_id", "product_id", "category", "price", "timestamp", "time_on_page_seconds"],
+  "field_types": {
+    "user_id": "string",
+    "session_id": "string",
+    "product_id": "string",
+    "category": "string",
+    "price": "float",
+    "timestamp": "iso8601",
+    "time_on_page_seconds": "integer"
+  },
+  "field_ranges": {
+    "price": {"min": 0.01, "max": 100000},
+    "time_on_page_seconds": {"min": 1, "max": 3600},
+    "category": {"enum": ["electronics", "clothing", "home", "sports", "books", "beauty", "toys", "food"]}
+  }
+}

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopStream — Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; }
+  header { background: linear-gradient(135deg, #1a1f2e, #2d3748); padding: 24px 32px; border-bottom: 1px solid #2d3748; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 24px; font-weight: 700; color: #63b3ed; }
+  header p  { font-size: 13px; color: #718096; margin-top: 2px; }
+  .logo { font-size: 32px; }
+  .controls { padding: 20px 32px; background: #1a1f2e; border-bottom: 1px solid #2d3748; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .controls label { font-size: 13px; color: #a0aec0; }
+  .controls input { background: #2d3748; border: 1px solid #4a5568; color: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+  .btn { background: #3182ce; color: white; border: none; padding: 9px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .btn:hover { background: #2b6cb0; }
+  .btn:disabled { background: #4a5568; cursor: not-allowed; }
+  .summary-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px 32px; }
+  .summary-item { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 10px; padding: 16px 20px; text-align: center; }
+  .summary-number { font-size: 28px; font-weight: 700; color: #63b3ed; }
+  .summary-label  { font-size: 12px; color: #718096; margin-top: 4px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; padding: 0 32px 32px; }
+  .card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d3748; }
+  .card-title { font-size: 15px; font-weight: 600; color: #e2e8f0; }
+  .card-body { padding: 16px 20px; }
+  .status-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
+  .status-ok      { background: #1c4532; color: #68d391; border: 1px solid #276749; }
+  .status-error   { background: #742a2a; color: #fc8181; border: 1px solid #9b2c2c; }
+  .status-loading { background: #2a4365; color: #63b3ed; border: 1px solid #2c5282; }
+  .status-pending { background: #2d3748; color: #a0aec0; border: 1px solid #4a5568; }
+  .endpoint-url { font-size: 11px; color: #4a5568; font-family: monospace; margin-bottom: 12px; word-break: break-all; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; color: #718096; font-weight: 600; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid #2d3748; }
+  td { padding: 8px 10px; border-bottom: 1px solid #1e2535; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #222836; }
+  .metric-value { font-weight: 600; color: #63b3ed; }
+  .tag { display: inline-block; background: #2d3748; color: #a0aec0; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
+  .anomaly-score { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+  .score-high   { background: #742a2a; color: #fc8181; }
+  .score-medium { background: #7b341e; color: #f6ad55; }
+  .score-low    { background: #1c4532; color: #68d391; }
+  .empty { text-align: center; color: #4a5568; padding: 32px; font-size: 14px; }
+  .response-time { font-size: 11px; color: #4a5568; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🛒</div>
+  <div>
+    <h1>ShopStream — Dashboard de Métricas</h1>
+    <p>Pipeline Big Data AWS — Big Data e Ingeniería de Datos 2026</p>
+  </div>
+</header>
+
+<div class="controls">
+  <label>Fecha:</label>
+  <input type="date" id="dateInput" value="2024-01-15">
+  <label>País:</label>
+  <input type="text" id="countryInput" value="CO" style="width:80px">
+  <label>Dispositivo:</label>
+  <input type="text" id="deviceInput" placeholder="mobile, desktop..." style="width:120px">
+  <label>Límite:</label>
+  <input type="number" id="limitInput" value="10" min="1" max="50" style="width:70px">
+  <button class="btn" id="loadBtn" onclick="loadAll()">🔄 Cargar datos</button>
+</div>
+
+<div class="summary-bar">
+  <div class="summary-item">
+    <div class="summary-number" id="sumSessions">—</div>
+    <div class="summary-label">Total Sesiones</div>
+  </div>
+  <div class="summary-item">
+    <div class="summary-number" id="sumAnomalies">—</div>
+    <div class="summary-label">Anomalías Detectadas</div>
+  </div>
+  <div class="summary-item">
+    <div class="summary-number" id="sumPages">—</div>
+    <div class="summary-label">Páginas Analizadas</div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">⏱️ Top Páginas — Tiempo de Permanencia</div>
+      <span class="status-badge status-pending" id="status1">Pendiente</span>
+    </div>
+    <div class="card-body">
+      <div class="endpoint-url" id="url1">—</div>
+      <div id="content1"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div class="response-time" id="time1"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">📉 Tasa de Rebote por Tipo de Página</div>
+      <span class="status-badge status-pending" id="status2">Pendiente</span>
+    </div>
+    <div class="card-body">
+      <div class="endpoint-url" id="url2">—</div>
+      <div id="content2"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div class="response-time" id="time2"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🌎 Sesiones por País y Dispositivo</div>
+      <span class="status-badge status-pending" id="status3">Pendiente</span>
+    </div>
+    <div class="card-body">
+      <div class="endpoint-url" id="url3">—</div>
+      <div id="content3"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div class="response-time" id="time3"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🚨 Anomalías Detectadas</div>
+      <span class="status-badge status-pending" id="status4">Pendiente</span>
+    </div>
+    <div class="card-body">
+      <div class="endpoint-url" id="url4">—</div>
+      <div id="content4"><div class="empty">Presiona "Cargar datos"</div></div>
+      <div class="response-time" id="time4"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://lnivpuaw80.execute-api.us-east-1.amazonaws.com/production";
+
+function getDate()    { return document.getElementById("dateInput").value; }
+function getCountry() { return document.getElementById("countryInput").value.toUpperCase(); }
+function getDevice()  { return document.getElementById("deviceInput").value.toLowerCase(); }
+function getLimit()   { return document.getElementById("limitInput").value; }
+
+function setStatus(id, status, code) {
+  const el = document.getElementById("status" + id);
+  el.className = "status-badge";
+  if (status === "ok")      { el.classList.add("status-ok");      el.textContent = "✓ " + code; }
+  else if (status === "error") { el.classList.add("status-error"); el.textContent = "✗ " + code; }
+  else                      { el.classList.add("status-loading"); el.textContent = "Cargando..."; }
+}
+
+async function fetchAPI(url, cardId) {
+  setStatus(cardId, "loading", "");
+  document.getElementById("url" + cardId).textContent = url.replace(API, "");
+  const t0 = Date.now();
+  try {
+    const res  = await fetch(url);
+    const ms   = Date.now() - t0;
+    const data = await res.json();
+    setStatus(cardId, res.ok ? "ok" : "error", res.status);
+    document.getElementById("time" + cardId).textContent = "Tiempo de respuesta: " + ms + "ms";
+    return data;
+  } catch (e) {
+    setStatus(cardId, "error", "ERR");
+    document.getElementById("time" + cardId).textContent = "Error: " + e.message;
+    document.getElementById("content" + cardId).innerHTML = '<div class="empty">❌ ' + e.message + '</div>';
+    return null;
+  }
+}
+
+async function loadTopPages() {
+  const url  = API + "/pages/top?metric=time_on_page&date=" + getDate() + "&limit=" + getLimit();
+  const data = await fetchAPI(url, 1);
+  if (!data || !data.data || !data.data.length) {
+    document.getElementById("content1").innerHTML = '<div class="empty">Sin datos para esta fecha</div>';
+    return;
+  }
+  document.getElementById("sumPages").textContent = data.count;
+  let html = '<table><tr><th>Página</th><th>Tipo</th><th>Avg (seg)</th><th>Visitas</th></tr>';
+  data.data.forEach(function(r) {
+    html += '<tr><td style="font-family:monospace;font-size:11px">' + r.page_url + '</td><td><span class="tag">' + r.page_type + '</span></td><td class="metric-value">' + parseFloat(r.avg_time_seconds).toFixed(1) + '</td><td>' + r.total_visits + '</td></tr>';
+  });
+  html += '</table>';
+  document.getElementById("content1").innerHTML = html;
+}
+
+async function loadBounceRate() {
+  const url  = API + "/pages/top?metric=bounce_rate&date=" + getDate() + "&limit=10";
+  const data = await fetchAPI(url, 2);
+  if (!data || !data.data || !data.data.length) {
+    document.getElementById("content2").innerHTML = '<div class="empty">Sin datos para esta fecha</div>';
+    return;
+  }
+  let html = '<table><tr><th>Tipo</th><th>Sesiones</th><th>Rebotes</th><th>Tasa</th></tr>';
+  data.data.forEach(function(r) {
+    const pct   = parseFloat(r.bounce_rate_pct);
+    const color = pct > 80 ? "#fc8181" : pct > 50 ? "#f6ad55" : "#68d391";
+    html += '<tr><td><span class="tag">' + r.page_type + '</span></td><td>' + r.total_sessions + '</td><td>' + r.bounce_sessions + '</td><td style="color:' + color + ';font-weight:700">' + pct.toFixed(1) + '%</td></tr>';
+  });
+  html += '</table>';
+  document.getElementById("content2").innerHTML = html;
+}
+
+async function loadSessions() {
+  let url = API + "/sessions/summary?date=" + getDate();
+  if (getCountry()) url += "&country=" + getCountry();
+  if (getDevice())  url += "&device="  + getDevice();
+  const data = await fetchAPI(url, 3);
+  if (!data) return;
+  document.getElementById("sumSessions").textContent = data.total_sessions || "0";
+  if (!data.data || !data.data.length) {
+    document.getElementById("content3").innerHTML = '<div class="empty">Sin datos para este filtro</div>';
+    return;
+  }
+  let html = '<div style="margin-bottom:12px;font-size:12px;color:#a0aec0">Total sesiones: <strong style="color:#63b3ed">' + data.total_sessions + '</strong> | Usuarios únicos: <strong style="color:#63b3ed">' + data.total_users + '</strong></div>';
+  html += '<table><tr><th>Dispositivo</th><th>País</th><th>Sesiones</th><th>Usuarios</th><th>Avg (seg)</th></tr>';
+  data.data.forEach(function(r) {
+    html += '<tr><td><span class="tag">' + r.device_type + '</span></td><td><strong>' + r.country + '</strong></td><td class="metric-value">' + r.total_sessions + '</td><td>' + r.unique_users + '</td><td>' + parseFloat(r.avg_time_seconds || 0).toFixed(1) + '</td></tr>';
+  });
+  html += '</table>';
+  document.getElementById("content3").innerHTML = html;
+}
+
+async function loadAnomalies() {
+  const url  = API + "/anomalies?date=" + getDate();
+  const data = await fetchAPI(url, 4);
+  if (!data) return;
+  document.getElementById("sumAnomalies").textContent = data.total || "0";
+  if (!data.data || !data.data.length) {
+    document.getElementById("content4").innerHTML = '<div class="empty">Sin anomalías detectadas</div>';
+    return;
+  }
+  let html = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
+  Object.keys(data.by_type).forEach(function(type) {
+    html += '<span class="tag">' + type + ': <strong style="color:#63b3ed">' + data.by_type[type] + '</strong></span>';
+  });
+  html += '</div>';
+  html += '<table><tr><th>Sesión</th><th>Tipo</th><th>Campo</th><th>Z-Score</th></tr>';
+  data.data.slice(0, 15).forEach(function(r) {
+    const z   = parseFloat(r.z_score);
+    const cls = z > 10 ? "score-high" : z > 5 ? "score-medium" : "score-low";
+    html += '<tr><td style="font-family:monospace;font-size:10px">' + (r.session_id || "").substring(0,20) + '...</td><td><span class="tag" style="font-size:10px">' + (r.anomaly_type || "").replace("zscore_","z:").replace("iqr_","iqr:") + '</span></td><td style="font-size:12px">' + r.anomaly_field + '</td><td><span class="anomaly-score ' + cls + '">' + z.toFixed(2) + '</span></td></tr>';
+  });
+  if (data.total > 15) html += '<tr><td colspan="4" style="text-align:center;color:#4a5568;font-size:12px">... y ' + (data.total - 15) + ' más</td></tr>';
+  html += '</table>';
+  document.getElementById("content4").innerHTML = html;
+}
+
+async function loadAll() {
+  const btn = document.getElementById("loadBtn");
+  btn.disabled = true;
+  btn.textContent = "⏳ Cargando...";
+  document.getElementById("sumSessions").textContent  = "—";
+  document.getElementById("sumAnomalies").textContent = "—";
+  document.getElementById("sumPages").textContent     = "—";
+  await Promise.all([loadTopPages(), loadBounceRate(), loadSessions(), loadAnomalies()]);
+  btn.disabled = false;
+  btn.textContent = "🔄 Cargar datos";
+}
+
+window.onload = loadAll;
+</script>
+</body>
+</html>
