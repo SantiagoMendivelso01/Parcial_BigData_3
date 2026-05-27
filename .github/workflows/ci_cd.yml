@@ -21,7 +21,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install faker numpy pytest boto3 moto[s3,cloudwatch] flask psycopg2-binary
+          pip install faker numpy pytest boto3 moto[s3,cloudwatch] flask flask-cors psycopg2-binary
 
       - name: Tests generacion de datos
         run: pytest data_generation/tests/ -v --import-mode=importlib
