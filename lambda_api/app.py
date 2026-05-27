@@ -1,10 +1,13 @@
 import os
 from flask import Flask, jsonify
+from flask_cors import CORS
 from routes.pages import pages_bp
 from routes.sessions import sessions_bp
 from routes.anomalies import anomalies_bp
 
 app = Flask(__name__)
+CORS(app)
+
 app.register_blueprint(pages_bp)
 app.register_blueprint(sessions_bp)
 app.register_blueprint(anomalies_bp)
