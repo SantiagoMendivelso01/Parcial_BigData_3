@@ -42,3 +42,16 @@ def top_pages():
 
     rows = query_to_list(sql, (date, limit_int))
     return jsonify({"metric": metric, "date": date, "count": len(rows), "data": rows})
+
+
+@pages_bp.route("/dates")
+def available_dates():
+    from db import query_to_list
+    sql = """
+        SELECT DISTINCT event_date::text as date
+        FROM bounce_rate
+        ORDER BY event_date DESC
+        LIMIT 30
+    """
+    rows = query_to_list(sql)
+    return jsonify({"dates": [r["date"] for r in rows]})
