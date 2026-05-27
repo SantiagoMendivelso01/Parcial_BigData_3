@@ -526,7 +526,7 @@ async function loadBounce() {
 
 // ── Panel 3: Timeline por fecha ───────────────────────
 async function loadTimeline() {
-  if (allDates.length < 2) { get('rt5').textContent = 'Solo hay una fecha disponible'; return; }
+  if (allDates.length < 1) { get("rt5").textContent = "Sin fechas disponibles"; return; }
 
   try {
     const results = await Promise.all(allDates.map(async d => {
@@ -659,7 +659,8 @@ async function loadAll() {
 
 window.onload = async () => {
   await loadFilters();
-  await Promise.all([loadAll(), loadTimeline()]);
+  await loadTimeline();
+  await loadAll();
 };
 </script>
 </body>
